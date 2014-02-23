@@ -51,6 +51,14 @@ public class TablaIgnorados extends JTable{
 	public void setLista(ArrayList<String> lista) {
 		this.lista = lista;
 	}
+
+	public DefaultTableModel getModelo() {
+		return modelo;
+	}
+
+	public void setModelo(DefaultTableModel modelo) {
+		this.modelo = modelo;
+	}
 	
 	
 }

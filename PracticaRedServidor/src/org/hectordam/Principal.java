@@ -18,14 +18,14 @@ public class Principal {
 			while (servidor.estaConectado()) {
 				cliente = new Cliente(servidor.escuchar(), servidor);
 				
-				if(servidor.existeEquipo()){
-					cliente.getSalida().println("/server Ya existe un equipo con esta direccion");
-				}
-				else{
+				//if(servidor.existeEquipo()){
+					//cliente.getSalida().println("/server Ya existe un equipo con esta direccion");
+				//}
+				//else{
 					servidor.anadirCliente(cliente);
 				
 					cliente.start();
-				}
+				//}
 				
 				
 			}

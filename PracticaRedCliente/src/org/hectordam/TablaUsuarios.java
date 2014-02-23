@@ -30,6 +30,14 @@ public class TablaUsuarios extends JTable{
 		}
 		
 	}
+
+	public DefaultTableModel getModelo() {
+		return modelo;
+	}
+
+	public void setModelo(DefaultTableModel modelo) {
+		this.modelo = modelo;
+	}
 	
 	
 }

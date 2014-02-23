@@ -34,6 +34,9 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
 public class Ventana {
 
 	private Socket socket;
@@ -68,6 +71,7 @@ public class Ventana {
 	
 	private ArrayList<String> lista;
 	private boolean ignorado;
+	private boolean existe;
 	
 
 	private void conectarServidor(String servidor) {
@@ -94,6 +98,7 @@ public class Ventana {
 								continue;
 							
 							int indice = 0;
+							existe = false;
 							
 							if (mensaje.startsWith("/server")) {
 								indice = mensaje.indexOf(" ");			
@@ -101,6 +106,25 @@ public class Ventana {
 							}
 							else if (mensaje.startsWith("/ping")){
 								salida.println("/pong");
+							}
+							else if (mensaje.startsWith("/write")){
+								indice = mensaje.indexOf(" ");
+								for(String nombre: tablaEscritura.getLista()){
+									if(mensaje.substring(indice + 1).equalsIgnoreCase(nombre)){
+										existe = true;
+									}
+								}
+								if(!existe){
+									tablaEscritura.insertar(mensaje.substring(indice + 1));
+								}
+							}
+							else if (mensaje.startsWith("/nowrite")){
+								indice = mensaje.indexOf(" ");
+								for(int i = 0; i < tablaEscritura.getLista().size(); i++){
+									if(mensaje.substring(indice + 1).equalsIgnoreCase(tablaEscritura.getLista().get(i))){
+										tablaEscritura.eliminar(tablaEscritura.getLista().get(i));
+									}
+								}
 							}
 							else if (mensaje.startsWith("/nicks")) {
 								String[] nicks = mensaje.split(",");
@@ -157,12 +181,27 @@ public class Ventana {
 		
 		if(comboBox.getSelectedItem() == null){
 			salida.println(mensaje);
+			taEnviar.setText("");
 		}
 		else{
 			salida.println(mensaje + "-,-," + comboBox.getSelectedItem());
+			taEnviar.setText("");
+			salida.println("/nowrite " + comboBox.getSelectedItem());
 		}
 		
-		taEnviar.setText("");
+	}
+	
+	private void escribiendo(){
+		
+		if(comboBox.getSelectedItem() == null){
+			return;
+		}
+		
+		if(!taEnviar.getText().equalsIgnoreCase("")){
+			//salida.println("/nowrite " + comboBox.getSelectedItem());
+			salida.println("/write " + comboBox.getSelectedItem());
+		}
+		
 	}
 
 	private void desconectar() {
@@ -274,6 +313,12 @@ public class Ventana {
 		spEscribiendo.setViewportView(tablaEscritura);
 		
 		taEnviar = new JTextArea();
+		taEnviar.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				escribiendo();
+			}
+		});
 		spTexto.setViewportView(taEnviar);
 		panelInferior.setLayout(gl_panelInferior);
 		
@@ -341,6 +386,16 @@ public class Ventana {
 		mnChat.add(mntmDesconectar);
 		
 		mntmSalir = new JMenuItem("Salir");
+		mntmSalir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				salida.println("/quit");
+				
+				tablaEscritura.getModelo().setNumRows(0);
+				tablaIgnorados.getModelo().setNumRows(0);
+				tablaUsuarios.getModelo().setNumRows(0);
+				comboBox.removeAllItems();
+			}
+		});
 		mnChat.add(mntmSalir);
 	}
 }
