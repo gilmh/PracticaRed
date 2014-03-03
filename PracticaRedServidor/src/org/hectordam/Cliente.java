@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.gjt.mm.mysql.Driver;
 
@@ -33,7 +34,7 @@ public class Cliente extends Thread{
 		
 		salida = new PrintWriter(socket.getOutputStream(), true);
 		entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		
+		/*
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/basechat", "root", "");
@@ -47,6 +48,7 @@ public class Cliente extends Thread{
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	public void desconectar() throws IOException, SQLException{
@@ -68,12 +70,13 @@ public class Cliente extends Thread{
 			int pos = 0;
 			if(nick.startsWith("/reg")){
 				pos = nick.indexOf(" ");
-				
-				String sentenciaSql = "INSERT INTO usuarios (nombre) VALUES (?)";
-				PreparedStatement sentencia = conexion.prepareStatement(sentenciaSql);
-				sentencia.setString(1, nick.substring(pos + 1));
-				sentencia.executeUpdate();
 				pos += 1;
+				
+				Usuario usuario = new Usuario();
+				usuario.setNick(nick.substring(pos));
+				Servidor.db.store(usuario);
+				Servidor.db.commit();
+				
 			}
 			
 			setNick(nick.substring(pos));

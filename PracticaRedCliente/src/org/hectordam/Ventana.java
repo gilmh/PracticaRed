@@ -23,6 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -36,6 +37,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Ventana {
 
@@ -218,6 +221,31 @@ public class Ventana {
 		
 		lista = new ArrayList<String>();
 		
+		Thread hilo = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				
+				try {
+					InetAddress equipoRemoto = InetAddress.getByName("localhost");
+					
+					while(true){
+						
+						try {
+							if (equipoRemoto.isReachable(3000))
+								mntmConectar.setEnabled(true);
+							else
+								mntmConectar.setEnabled(false);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		hilo.start();
 	}
 	
 	private void ignorarUsuario(){
@@ -261,8 +289,21 @@ public class Ventana {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				try {
+					if(socket != null){
+						socket.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				System.exit(0);
+			}
+		});
 		frame.setBounds(100, 100, 530, 392);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		spChat = new JScrollPane();
 		frame.getContentPane().add(spChat, BorderLayout.CENTER);

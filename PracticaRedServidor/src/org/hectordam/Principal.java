@@ -2,11 +2,10 @@ package org.hectordam;
 
 import java.io.IOException;
 
-
 public class Principal {
-	
-	public static final int PUERTO = 7000;
 
+	public static final int PUERTO = 7000;
+	
 	public static void main(String[] args) {
 		
 		Servidor servidor = new Servidor(PUERTO);
@@ -26,11 +25,11 @@ public class Principal {
 				
 					cliente.start();
 				//}
-				
-				
 			}
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
+		
 	}
+
 }

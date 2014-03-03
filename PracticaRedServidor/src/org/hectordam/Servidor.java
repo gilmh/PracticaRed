@@ -9,6 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.db4o.Db4oEmbedded;
+import com.db4o.ObjectContainer;
+
+
 
 
 /**
@@ -24,13 +30,16 @@ public class Servidor {
 	private ArrayList<Cliente> clientes;
 	private ArrayList<String> registrados;
 	
-	private Connection conexion;
+	public static ObjectContainer db;
+	//private Connection conexion;
 	
 	public Servidor(int puerto) {
 		this.puerto = puerto;
 		clientes = new ArrayList<Cliente>();
 		registrados = new ArrayList<String>();
 		
+		db = Db4oEmbedded.openFile(Db4oEmbedded.newConfiguration(), "usuarios.db4o");
+		/*
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			conexion = DriverManager.getConnection("jdbc:mysql://localhost:3306/basechat", "root", "");
@@ -44,6 +53,7 @@ public class Servidor {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		*/
 	}
 	
 	public void anadirCliente(Cliente cliente) {
@@ -84,27 +94,23 @@ public class Servidor {
 	
 	public void enviarNicks() throws SQLException {
 		
-		Statement sentencia = this.conexion.createStatement();
-		String consulta = "select * from usuarios";
-		ResultSet resultado = sentencia.executeQuery(consulta);
-		
+		List<Usuario> registro = Servidor.db.query(Usuario.class);
 		registrados.clear();
 		
-		while (resultado.next()) {
-			registrados.add(resultado.getString(2));
+		for(Usuario usuario: registro){
+			registrados.add(usuario.getNick());
 		}
+		
 		String nicks = "/nicks,";
 		
-		for(int i = registrados.size()-1; i >= 0; i--){
-			for (Cliente cliente : clientes) {
+		for (Cliente cliente : clientes) {
+			nicks += cliente.getNick() + ",";
+			
+			for(int i = registrados.size()-1; i >= 0; i--){
 				if(cliente.getNick().equalsIgnoreCase(registrados.get(i))){
 					registrados.remove(i);
 				}
 			}
-		}
-		
-		for (Cliente cliente : clientes) {
-			nicks += cliente.getNick() + ",";			
 		}
 		for (int i = 0; i < registrados.size(); i++) {
 			nicks += "#" + registrados.get(i) + ",";			
@@ -133,6 +139,7 @@ public class Servidor {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 	

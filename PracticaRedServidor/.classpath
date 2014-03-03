@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/nose/Desktop/2-DAM/desarrollo de interfaces/tema 2/JasperReport/mysql-connector-java-5.1.27-bin.jar"/>
+	<classpathentry kind="lib" path="db4o-8.0.249.16098-all-java5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
